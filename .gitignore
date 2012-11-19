@@ -1,0 +1,6 @@
+# gitignore
+
+*.un~
+*.a
+*.o
+hello
