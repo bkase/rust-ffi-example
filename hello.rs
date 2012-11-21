@@ -1,13 +1,20 @@
 use libc::c_int;
+use libc::c_char;
 
 #[link_args="-L."]
 extern mod runtime {
-  fn run(callMeFromC: *u8) -> c_int;
+  fn run(argc: c_int, argv: **c_char, callMeFromC: *u8) -> c_int;
 }
 
+fn identity<T>(x: T) -> T { x }
+
 fn main() {
+  let args: ~[~str] = os::args();
+  let argc: c_int = args.len() as c_int;
   unsafe {
-    runtime::run(callMeFromC);
+    let argsVec: ~[*c_char] = args.map(|arg| { str::as_c_str(*arg, identity) });
+    let argv: **c_char = vec::raw::to_ptr(argsVec);
+    runtime::run(argc, argv, callMeFromC);
   }
 }
 
